@@ -1,9 +1,6 @@
 import numpy as np
 import random as rd
-from tqdm import tqdm
-from matplotlib import pyplot as plt
-from scipy.optimize import curve_fit as cf
-from scipy.optimize import leastsq
+from tqdm import tqd
 import os
 
 def drop_one_particle(crystal):
@@ -52,20 +49,24 @@ def test_func(x, beta, alpha):
     tx = L**(alpha/beta)
     return heavy_side(tx-x)*(x**beta) + heavy_side(x-tx)*(L**alpha)
 
-def cost_func(param, y, x):
-    model = test_func(x, param[0], param[1], param[2])
-    return y - model
+def correlation(r, heights):
+    mean_height = np.mean(heights)
+    g = []
+    for index in range(len(heights)):
+        g.append((heights[(index+r)%len(heights)] - mean_height) * (heights[index]-mean_height))
+    return np.mean(np.asarray(g))
 
 
-L = 100                       #dimension of the square lattice
+
+####################################################################################################
+####################################################################################################
+
 monolayers = 200
+L=90
 n_particles = monolayers * L
 y_dim = 3
-
-
 std_height_time = np.zeros(n_particles)
-
-routines = 5
+routines = 100
 for iteration in tqdm(range(routines)):
     crystal = np.zeros([y_dim, L])
     for i in tqdm(range(n_particles)):
@@ -77,28 +78,28 @@ for iteration in tqdm(range(routines)):
         std_height_time[i]+=std
 
 std_height_time = std_height_time/routines
-print(height_analysis(crystal))
+#params = interface_width(n_particles, std_height_time)
 
 
-"""file = open("std_height_time.dat", "w")
-for elem in std_height_time:
-    file.write(str(elem)+"\n")
+os.chdir("/home/algoking/Documents/M2/Crystal_growth/output")
+file = open("w_vs_t_(" + str(L) + ", " + str(monolayers) + ", " + str(routines) + ")", "w")
+for index in range(len(std_height_time)):
+    file.write(str(index)+" "+str(std_height_time[index]) + "\n")
 file.close()
-print(len(std_height_time))"""
+os.chdir("/home/algoking/Documents/M2/Crystal_growth/")
 
-xlist = np.arange(n_particles)
-best_param, covar = cf(test_func, xlist, std_height_time,p0 = [1, 1])
-print(best_param)
-tx = L**(best_param[1]/best_param[0])
-print("t0: ", tx)
-print("z: ",np.log(tx-L))
-print(covar)
+"""G = np.empty(L)
+for i in range(L):
+    G[i] = correlation(i,column_heights)
+print(G)
+"""
 
-
-"""fig = plt.imshow(crystal)
-fig.axes.get_xaxis().set_visible(False)
-fig.axes.get_yaxis().set_visible(False)"""
-plt.plot(std_height_time)
-plt.plot(xlist, test_func(xlist, best_param[0], best_param[1]))
-"""plt.imshow(crystal)"""
-plt.show()
+#plt.imshow(crystal)
+#plt.plot(G)
+#plt.legend(plot_legend)
+"""plt.xscale("log")
+plt.yscale("log")
+plt.set_ylabel("width w")
+plt.set_xlabel("t")
+plt.set_title("Dependancy of crossover time on L")
+plt.show()"""
