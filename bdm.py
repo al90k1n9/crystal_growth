@@ -41,13 +41,7 @@ def height_analysis(crystal):       #returns std dev and mean height of the crys
     std_height = np.std(column_heights)
     return(mean_height, std_height, column_heights)
 
-def heavy_side(x):                          #step function
-    return x>0
 
-def test_func(x, beta, alpha):
-    global L
-    tx = L**(alpha/beta)
-    return heavy_side(tx-x)*(x**beta) + heavy_side(x-tx)*(L**alpha)
 
 def correlation(r, heights):
     mean_height = np.mean(heights)
