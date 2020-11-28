@@ -1,6 +1,6 @@
 import numpy as np
 import random as rd
-from tqdm import tqd
+from tqdm import tqdm
 import os
 
 def drop_one_particle(crystal):
@@ -55,12 +55,12 @@ def correlation(r, heights):
 ####################################################################################################
 ####################################################################################################
 
-monolayers = 200
-L=90
+monolayers = 5
+L=10
 n_particles = monolayers * L
 y_dim = 3
 std_height_time = np.zeros(n_particles)
-routines = 100
+routines = 1
 for iteration in tqdm(range(routines)):
     crystal = np.zeros([y_dim, L])
     for i in tqdm(range(n_particles)):
@@ -73,7 +73,7 @@ for iteration in tqdm(range(routines)):
 
 std_height_time = std_height_time/routines
 #params = interface_width(n_particles, std_height_time)
-
+print(crystal)
 
 os.chdir("/home/algoking/Documents/M2/Crystal_growth/output")
 file = open("w_vs_t_(" + str(L) + ", " + str(monolayers) + ", " + str(routines) + ")", "w")
@@ -87,13 +87,3 @@ for i in range(L):
     G[i] = correlation(i,column_heights)
 print(G)
 """
-
-#plt.imshow(crystal)
-#plt.plot(G)
-#plt.legend(plot_legend)
-"""plt.xscale("log")
-plt.yscale("log")
-plt.set_ylabel("width w")
-plt.set_xlabel("t")
-plt.set_title("Dependancy of crossover time on L")
-plt.show()"""

@@ -11,7 +11,8 @@ def test_func(x, beta, alpha):
     tx = L**(alpha/beta)
     return heavy_side(tx-x)*(x**beta) + heavy_side(x-tx)*(L**alpha)
 
-def interface_width(L, n_particles, std_height_time, show_params = False, data = True, data_fit = True):
+def interface_width(n_particles, std_height_time, show_params = False, data = True, data_fit = True):
+    global L
     xlist = np.arange(n_particles)
     best_param, covar = cf(test_func, xlist, std_height_time,p0 = [1, 1])
     tx = L**(best_param[1]/best_param[0])
@@ -36,7 +37,7 @@ for elem in suffix:
     L = elem[0]
     plot_legend.append("L=" + str(L))
     n_particles = elem[0] * elem[1]
-    interface_width(L,n_particles, ylist, data_fit=False)
+    interface_width(n_particles, ylist, data_fit=False)
 
 plt.yscale("log")
 plt.xscale("log")
