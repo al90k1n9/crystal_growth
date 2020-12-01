@@ -41,6 +41,40 @@ def diffuse(crystal):
                 continue
     return crystal
 
+def peek_in_diffuse(crystal):
+    rows, cols = np.shape(crystal)
+    print(rows, cols)
+    diffusion_order = np.arange(cols)
+    rd.shuffle(diffusion_order)
+    print(diffusion_order)
+    diffusion_range = 1
+    for col in diffusion_order:
+        h = height_per_column(crystal[:,col])
+        h_plus = height_per_column(crystal[:,(col+1)%cols])
+        h_minus = height_per_column(crystal[:,col-1])
+        print(h, h_minus, h_plus)
+        if crystal[rows-h, col] < diffusion_range+1 and h != 0:
+            if h_plus < h-1 and h_minus < h-1:
+                print("condition 1")
+                if h_plus < h_minus: crystal[rows-h_plus-1,(col+1)%cols] = 1 + crystal[rows-h,col]
+                elif h_minus < h_plus :crystal[rows-h_minus-1,(col-1)] = 1 + crystal[rows-h,col]
+                else:
+                    if rd.random()<0.5 : crystal[rows-h_plus-1,(col+1)%cols] = 1 + crystal[rows-h,col]
+                    else : crystal[rows-h_minus-1,(col-1)] = 1 + crystal[rows-h,col]
+                crystal[rows-h,col] = 0
+                continue
+            if h_minus < h-1:
+                print("condition 2")
+                crystal[rows-h_minus-1,(col-1)] = 1 + crystal[rows-h,col]
+                crystal[rows-h,col] = 0
+                continue
+            if h_plus < h-1:
+                print("condition 3")
+                crystal[rows-h_plus-1,(col+1)%cols] = 1 + crystal[rows-h,col]
+                crystal[rows-h,col] = 0
+                continue
+    return crystal
+
 L=10
 crystal= np.asarray([[0., 0., 0., 0., 0., 0., 0., 0., 0., 0.],
  [0., 0., 0., 0., 0., 0., 0., 0., 0., 0.],
@@ -62,12 +96,12 @@ initial_crystal = np.copy(crystal)
 print("initial number of particles: ", np.sum(crystal))
 print("\n\n\n")
 
-crystal = diffuse(crystal)
+crystal = peek_in_diffuse(crystal)
 
 print("final number of particles: ", np.sum(crystal))
 fig, axs = plt.subplots(1,3)
 fig.suptitle("crystal before and after diffusion of range 1")
 axs[0].imshow(initial_crystal)
 axs[1].imshow(crystal)
-axs[2].imshow(diffuse(crystal))
+axs[2].imshow(peek_in_diffuse(crystal))
 plt.show()

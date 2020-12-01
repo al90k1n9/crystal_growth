@@ -83,9 +83,7 @@ def correlation_r(heights):
     mean_height = np.mean(heights)
     g_r = np.zeros(L)
     for r in r_values:
-        g = []
-        for index in range(len(heights)):
-            g.append((heights[(index+r)%len(heights)] - mean_height) * (heights[index]-mean_height))
+        g = (np.roll(heights, -r)-mean_height) * (heights - mean_height)
         g_r[r] = np.mean(np.asarray(g))
     return(g_r)
 
