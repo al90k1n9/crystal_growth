@@ -13,7 +13,7 @@ def test_func(x, beta, alpha):
 
 def interface_width(n_particles, std_height_time, show_params = False, data = True, data_fit = True):
     global L
-    xlist = np.arange(n_particles)
+    xlist = np.arange(n_particles)/L
     best_param, covar = cf(test_func, xlist, std_height_time,p0 = [1, 1])
     tx = L**(best_param[1]/best_param[0])
     if show_params:
@@ -21,14 +21,13 @@ def interface_width(n_particles, std_height_time, show_params = False, data = Tr
         #print("t0: ", tx)
         #print("z: ",np.log(tx-L))
         #print(covar)
-    if data: plt.plot(xlist/(L**best_param[1]),std_height_time/(L**best_param[1]))
-    if data_fit:
-        #xlist = xlist/(L**best_param[0])
-        plt.plot(xlist, test_func(xlist, best_param[0], best_param[1]))
+
+    if data: plt.plot(xlist/tx,std_height_time/(L**best_param[1]))
+    if data_fit: plt.plot(xlist/tx, test_func(xlist, best_param[0], best_param[1])/(L**best_param[1]))
 
 
 prefix = "w_vs_t_"
-suffix = [(80,200,100), (90,200,100), (100,200,100), (120,300,100), (150,200,100)]
+suffix = [(50,200,100), (100,300,100), (200,500,100), (300,700,100)]
 plot_legend=[]
 for elem in suffix:
     filename = prefix + str(elem)
@@ -42,7 +41,10 @@ for elem in suffix:
 plt.yscale("log")
 plt.xscale("log")
 plt.legend(plot_legend)
-os.chdir("/home/algoking/Documents/M2/Crystal_growth/results")
-plt.savefig("comp_python.png")
-os.chdir("/home/algoking/Documents/M2/Crystal_growth")
+plt.xlabel("Number of monolayers/cross-over time")
+plt.ylabel("w/saturation_value")
+
+os.chdir("/home/algoking/Documents/M2/crystal_growth/results")
+plt.savefig("w_monolayers_L_50_300_logscale_collapse.png")
+#os.chdir("/home/algoking/Documents/M2/crystal_growth")
 plt.show()

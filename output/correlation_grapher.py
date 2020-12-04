@@ -1,5 +1,6 @@
 import numpy as np
 from matplotlib import pyplot as plt
+from tqdm import tqdm
 from matplotlib.animation import FuncAnimation
 plt.style.use('seaborn-pastel')
 
@@ -27,10 +28,11 @@ def animate(i):
     y = correlation_t[:,i]
     line.set_data(x, y)
     fig.legend("t=" + str(i))
+    print(i)
     return line,
 
 anim = FuncAnimation(fig, animate, init_func=init, frames=np.shape(correlation_t)[1], interval=20, blit=True,repeat = False)
 
 
-#anim.save('correlation.gif', writer='imagemagick')
-plt.show()
+anim.save('correlation(100,200).mp4', writer='ffmpeg')
+#plt.show()
