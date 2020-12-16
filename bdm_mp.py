@@ -7,8 +7,8 @@ import random as rd
 from datetime import datetime
 
 start = datetime.now()
-L = 100
-monolayers = L*40
+L = 800
+monolayers = L*50
 n_particles = L*monolayers
 routines = 100
 
@@ -19,7 +19,7 @@ routines = 100
 def one_deposition():
     global L
     global n_particles
-    std_height_time = np.zeros(n_particles//L)
+    std_height_time = np.zeros(monolayers)
     heights = np.zeros(L)
     std_index=0
     for i in tqdm(range(n_particles)):
@@ -31,17 +31,17 @@ def one_deposition():
     return std_height_time
 
 pool = mp.Pool(mp.cpu_count())
-results = [pool.apply(one_deposition, args=()) for iteration in range(routines)]
+results = [pool.apply_async(one_deposition, args=()) for iteration in range(routines)]
+Results = [elem.get() for elem in results]
 pool.close()
-print(len(results))
 std_height_time = np.zeros(n_particles//L)
-for elem in results:
+for elem in Results:
     std_height_time += elem
 std_height_time = std_height_time/routines
 
 
 os.chdir("/home/algoking/Documents/M2/crystal_growth/output")
-file = open("revised_w_vs_t_(" + str(L) + ", " + str(monolayers) + ", " + str(routines) + ")", "w")
+file = open("w_vs_t_(" + str(L) + ", " + str(monolayers) + ", " + str(routines) + ")", "w")
 for index in range(len(std_height_time)):
     file.write(str(index) + " " + str(std_height_time[index])+"\n")
 file.close()
