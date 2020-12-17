@@ -6,13 +6,12 @@ import numpy as np
 import random as rd
 from datetime import datetime
 
-start = datetime.now()
-L = 100
-monolayers = 200
+L = 10
+monolayers = 10
 n_particles = L*monolayers
 routines = 1
+diff_range = 3
 
-#crystal = np.zeros([monolayers*4,L])
 #crystal[np.shape(crystal)[0]-(int(heights[col])), col] = 1
 
 
@@ -24,25 +23,31 @@ def one_deposition():
     std_index=0
     for i in tqdm(range(n_particles)):
         col = rd.randint(0,L-1)
-        heights[col] = max(heights[col]+1, heights[col-1], heights[(col+1)%L])
-        if i%L == 0:
+        local_heights=[]
+        for i in range(col-diff_range, col+diff_range+1):
+            local_heights.append(heights[i])
+        min_col = local_heights.index(min(local_heights))
+        heights[min_col] += 1
+        """if i%L == 0:
             std_height_time[std_index] += np.std(heights)
-            std_index+=1
-    return std_height_time
+            std_index+=1"""
+    return heights
 
 pool = mp.Pool(mp.cpu_count())
 results = [pool.apply_async(one_deposition, args=()) for iteration in range(routines)]
 Results = [elem.get() for elem in results]
 pool.close()
 std_height_time = np.zeros(n_particles//L)
-for elem in Results:
+"""for elem in Results:
     std_height_time += elem
-std_height_time = std_height_time/routines
+std_height_time = std_height_time/routines"""
+plt.imshow(Results[0])
+plt.show()
 
 
-os.chdir("/home/algoking/Documents/M2/crystal_growth/output")
+"""os.chdir("/home/algoking/Documents/M2/crystal_growth/output")
 file = open("w_vs_t_(" + str(L) + ", " + str(monolayers) + ", " + str(routines) + ")", "w")
 for index in range(len(std_height_time)):
     file.write(str(index) + " " + str(std_height_time[index])+"\n")
 file.close()
-print(datetime.now()-start)
+print(datetime.now()-start)"""
