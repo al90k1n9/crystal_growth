@@ -2,11 +2,11 @@ from matplotlib import pyplot as plt
 import numpy as np
 import os
 
-filename = "correlation_[1,71]_(1000, 500)"
+filename = "correlation_[1,19]_(100, 21, 1000)"
 data = np.loadtxt(filename)
 print(np.shape(data))
-prefix1, time_stamp_range, dim_routines = filename.split("_")
-L= int(dim_routines[1:-1].split(",")[0])
+prefix1, time_stamp_range, L_m_r = filename.split("_")
+L= int(L_m_r[1:-1].split(",")[0])
 
 plot_legend=[]
 for i in range(0,np.shape(data)[0]):
