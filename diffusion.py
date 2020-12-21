@@ -6,16 +6,17 @@ import numpy as np
 import random as rd
 from datetime import datetime
 
-L = 10
-monolayers = 3
+L = 800
+monolayers = L*50
 n_particles = L*monolayers
-routines = 1
-diff_range = 3
+routines = 100
+diff_range = 1
+output_directory = "/home/algoking/Documents/M2/crystal_growth/output/diffusion/"
 
 calc_correlation = False
 calc_w = True
 
-crystal = np.zeros([L, monolayers * 4])
+crystal = np.zeros([monolayers*2, L])
 
 #crystal[np.shape(crystal)[0]-(int(heights[col])), col] = 1
 
@@ -37,16 +38,41 @@ def one_deposition():
     #std_height_time = np.zeros(monolayers)
     heights = np.zeros(L)
     std_index = 0
-    for i in range(n_particles):
+    std_height_time = np.zeros(monolayers)
+    for i in tqdm(range(n_particles)):
         col = rd.randint(0,L-1)
         min_col = find_min_col(heights, col)
         heights[min_col] += 1
-        print(col,min_col, heights)
-        crystal[np.shape(crystal)[0] - int(heights[min_col]), min_col] = 1
-
+        """if (i//(10*L))%2 == 0:
+            crystal[np.shape(crystal)[0] - int(heights[min_col]), min_col] = 1
+        else:
+            crystal[np.shape(crystal)[0] - int(heights[min_col]), min_col] = 2"""
+        if i%L == 0:
+            std_height_time[std_index] = np.std(heights)
+            std_index += 1
     if calc_w:
-        return crystal
+        return std_height_time
 
-crystal = one_deposition()
+
+
+
+pool = mp.Pool(mp.cpu_count())
+results = [pool.apply_async(one_deposition, args=()) for iteration in range(routines)]
+Results = [elem.get() for elem in results]
+pool.close()
+
+os.chdir(output_directory)
+if calc_w:
+    std_height_time = np.zeros(monolayers)
+    for elem in Results:
+        std_height_time += elem
+    std_height_time = std_height_time/routines
+    file = open("diffusion_w(t)_("+ str(L) + ", " + str(monolayers) + ", " + str(routines) + ")", "w")
+    for index in range(len(std_height_time)):
+        file.write(str(index) + " " + str(std_height_time[index])+"\n")
+    file.close()
+
+
+"""crystal = one_deposition()
 plt.imshow(crystal)
-plt.show()
+plt.show()"""
