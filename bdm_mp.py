@@ -16,13 +16,13 @@ def correlation_func(time, heights):
 
 
 
-L = 100
+L = 1000
 monolayers = 21
 n_particles = L*monolayers
-routines = 1000
+routines = 500
 calc_w = False
 calc_correlation = True
-correlation_time_stamps = np.arange(1,20,1)
+correlation_time_stamps = np.arange(1,10,1)
 
 #crystal = np.zeros([monolayers*4,L])
 #crystal[np.shape(crystal)[0]-(int(heights[col])), col] = 1
